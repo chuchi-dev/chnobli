@@ -45,11 +45,11 @@ export default class TestDomNode {
 
 	__simulatedDom__() {}
 
-	__getComputedStyleFn__() {
+	__getComputedStyleFn__(): typeof TestDomNode.getComputedStyle {
 		return TestDomNode.getComputedStyle;
 	}
 
-	__getRootElementFn__() {
+	__getRootElementFn__(): typeof getRootElement {
 		return getRootElement;
 	}
 }
@@ -58,7 +58,7 @@ export function el() {
 	return new TestDomNode();
 }
 
-export function getRootElement() {
+export function getRootElement(): TestDomNode {
 	if (!ROOT_ELEMENT) ROOT_ELEMENT = el();
 	return ROOT_ELEMENT;
 }

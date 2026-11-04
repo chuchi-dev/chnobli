@@ -5,21 +5,21 @@ export { curve };
 /**
  * Explicitly tells a property to animate the to value
  */
-export function to(to: any) {
+export function to(to: any): { to: any } {
 	return { to };
 }
 
 /**
  * Explicitly tells a property to animate the from value
  */
-export function from(from: any) {
+export function from(from: any): { from: any } {
 	return { from };
 }
 
 /**
  * Explicitly tells a property to animate with the from and to values
  */
-export function fromTo(from: any, to: any) {
+export function fromTo(from: any, to: any): { from: any; to: any } {
 	return { from, to };
 }
 
@@ -33,7 +33,9 @@ export function responsive(fn: (target: any) => void): any {
 /**
  * Converts an element with text into span with chars
  */
-export function chars(element: HTMLElement) {
+export function chars(
+	element: HTMLElement,
+): Element[] | (HTMLSpanElement | null)[] {
 	if (element.dataset.processedChars) return Array.from(element.children);
 
 	const chars = element.textContent!.split('');
@@ -75,7 +77,7 @@ function defWordCallback(element: HTMLElement, word: string): HTMLElement {
 export function words(
 	element: HTMLElement,
 	cb: WordCallback = defWordCallback,
-) {
+): Element[] | (HTMLElement | null)[] {
 	if (element.dataset.processedWords) return Array.from(element.children);
 
 	const words = element.textContent!.split(/(\s+)/);
@@ -98,7 +100,12 @@ export function words(
 /**
  * get the offset to the current page page
  */
-export function pageOffset(el: HTMLElement) {
+export function pageOffset(el: HTMLElement): {
+	top: number;
+	left: number;
+	width: number;
+	height: number;
+} {
 	const rect = (el as HTMLElement).getBoundingClientRect();
 	return {
 		top: window.scrollY + rect.top,

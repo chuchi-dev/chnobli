@@ -9,7 +9,7 @@ export default class Value {
 		this.unit = unit;
 	}
 
-	static parse(v: string | number) {
+	static parse(v: string | number): Value {
 		if (typeof v === 'number') {
 			return new Value(v);
 		}
@@ -20,29 +20,29 @@ export default class Value {
 		return new Value(parseFloat(num), unit ? unit : null);
 	}
 
-	eq(other: Value) {
+	eq(other: Value): boolean {
 		return this.unit === other.unit && this.num === other.num;
 	}
 
-	clone(newNum: number | null = null) {
+	clone(newNum: number | null = null): Value {
 		if (newNum !== null) return new Value(newNum, this.unit);
 
 		return new Value(this.num, this.unit);
 	}
 
-	cloneAdd(add: number) {
+	cloneAdd(add: number): Value {
 		return new Value(this.num + add, this.unit);
 	}
 
-	cloneMul(mul: number) {
+	cloneMul(mul: number): Value {
 		return new Value(this.num * mul, this.unit);
 	}
 
-	withDefaultUnit(unit: string | null) {
+	withDefaultUnit(unit: string | null): Value {
 		return new Value(this.num, this.unit ?? unit);
 	}
 
-	toString() {
+	toString(): string {
 		return this.num.toFixed(3) + (this.unit ?? '');
 	}
 }

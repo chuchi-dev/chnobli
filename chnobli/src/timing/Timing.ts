@@ -114,7 +114,7 @@ export default class Timing {
 	 *
 	 * This is equivalent to position * iteration duration
 	 */
-	positionMs() {
+	positionMs(): number {
 		// todo should this not return pos * duration?
 		return this.position * this.iterDuration;
 	}
@@ -126,7 +126,7 @@ export default class Timing {
 	 * If the state is before or after the position might be more/less than
 	 * required
 	 */
-	positionMsUnbounded() {
+	positionMsUnbounded(): number {
 		let reversed = this.reversed;
 
 		if (this._shouldInvert()) reversed = !reversed;
@@ -142,7 +142,7 @@ export default class Timing {
 		return pos * this.iterDuration;
 	}
 
-	isFinite() {
+	isFinite(): boolean {
 		return this.repeat > -1;
 	}
 
@@ -166,14 +166,14 @@ export default class Timing {
 		}
 	}
 
-	seekMs(ms: number) {
+	seekMs(ms: number): void {
 		return this.seek(this.normalizeMs(ms));
 	}
 
 	/**
 	 * Returns the position of time (ms) position
 	 */
-	normalizeMs(ms: number) {
+	normalizeMs(ms: number): number {
 		if (this.iterDuration <= 0) {
 			return Math.sign(ms);
 		}
@@ -236,7 +236,7 @@ export default class Timing {
 		}
 	}
 
-	_shouldInvert() {
+	_shouldInvert(): boolean {
 		return (
 			this.alternate &&
 			Math.floor(this.progress) % 2 === 1 &&

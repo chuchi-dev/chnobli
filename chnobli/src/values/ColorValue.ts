@@ -17,7 +17,7 @@ export default class ColorValue {
 		this.values = v;
 	}
 
-	static parse(v: string | number[]) {
+	static parse(v: string | number[]): ColorValue {
 		if (Array.isArray(v)) {
 			if (v.length < 3 || v.length > 4)
 				throw new Error('expected array [r, g, b, a]');
@@ -40,7 +40,7 @@ export default class ColorValue {
 	}
 
 	// v needs to be a string
-	static mightBeAColor(v: string) {
+	static mightBeAColor(v: string): boolean {
 		v = v.trim();
 
 		return (
@@ -51,11 +51,11 @@ export default class ColorValue {
 		);
 	}
 
-	clone() {
+	clone(): ColorValue {
 		return new ColorValue(this.values.slice() as any);
 	}
 
-	toString() {
+	toString(): string {
 		const [r, g, b, a] = this.values;
 		return `rgba(${[r, g, b].map(v => Math.round(v)).join(', ')}, ${a.toFixed(
 			3,

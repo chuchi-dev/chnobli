@@ -77,7 +77,7 @@ export default class StyleValue {
 				: false;
 	}
 
-	static parse(v: string | number | (string | number)[]) {
+	static parse(v: string | number | (string | number)[]): StyleValue {
 		if (typeof v === 'number') return new StyleValue(v);
 
 		if (Array.isArray(v)) {
@@ -120,7 +120,7 @@ export default class StyleValue {
 	}
 
 	/// only works if the kind is values
-	get length() {
+	get length(): number {
 		if (this.inner.kind !== 'values')
 			throw new Error('only works with kind values');
 
@@ -145,7 +145,7 @@ export default class StyleValue {
 		return (this.inner.values as Value[])[0];
 	}
 
-	clone() {
+	clone(): StyleValue {
 		if (this.inner.kind === 'text')
 			return new StyleValue(this.inner.values);
 
@@ -156,7 +156,7 @@ export default class StyleValue {
 	}
 
 	/// if this is called with a text value nothing happens
-	withDefaultUnit(unit: string | null) {
+	withDefaultUnit(unit: string | null): StyleValue {
 		if (this.inner.kind === 'text')
 			return new StyleValue(this.inner.values);
 
