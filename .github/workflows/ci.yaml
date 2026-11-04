@@ -27,7 +27,7 @@ jobs:
         run: npm run build
 
       - name: Run lint
-        run: cd chnobli && npm run lint
+        run: npm run lint --workspaces
 
       - name: Run tests
         run: npm run test

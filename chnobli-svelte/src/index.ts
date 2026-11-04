@@ -42,13 +42,13 @@ export function createTransition<A extends undefined>(
 }
 
 export function scroll(fn: (scroll: Scroll) => void) {
-	let scr = newScroll();
+	const scr = newScroll();
 
 	onMount(() => {
 		fn(scr);
 	});
 
 	onDestroy(() => {
-		scr?.destroy();
+		scr.destroy();
 	});
 }
