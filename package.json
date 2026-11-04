@@ -6,6 +6,10 @@
 	],
 	"scripts": {
 		"test": "npm run test --workspaces",
-		"build": "npm run build --workspaces"
+		"build": "npm run build --workspaces",
+		"check-jsr": "npm run check-jsr --workspaces"
+	},
+	"devDependencies": {
+		"jsr": "^0.14.3"
 	}
 }

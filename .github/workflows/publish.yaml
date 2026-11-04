@@ -1,0 +1,121 @@
+name: Publish Package
+
+on:
+  push:
+    tags:
+      - '*@v*.*.*' # Trigger on tags like chnobli@v0.1.12 or svelte@v0.1.5
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read # Allow reading the repository content
+      id-token: write # Required for Trusted Publishing, provenance and JSR
+    container:
+      image: node:24
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v6
+
+      - name: Parse Tag
+        run: |
+          # Extract the tag name (e.g., svelte@v0.1.5)
+          TAG_NAME="${GITHUB_REF##*/}"
+          PACKAGE_SHORT_NAME="${TAG_NAME%@*}"
+          VERSION="${TAG_NAME#*@v}"
+          if [ "${PACKAGE_SHORT_NAME}" = "chnobli" ]; then
+            PACKAGE_FOLDER="chnobli" # Special case for chnobli
+          else
+            PACKAGE_FOLDER="chnobli-${PACKAGE_SHORT_NAME}" # Add prefix for other packages
+          fi
+          echo "PACKAGE_SHORT_NAME=${PACKAGE_SHORT_NAME}" >> $GITHUB_ENV
+          echo "VERSION=${VERSION}" >> $GITHUB_ENV
+          echo "PACKAGE_FOLDER=${PACKAGE_FOLDER}" >> $GITHUB_ENV
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24.x'
+          registry-url: 'https://registry.npmjs.org'
+
+      # install latest npm for Trusted Publishing
+      - run: npm install -g npm@latest
+
+      - name: Check Version
+        shell: bash
+        run: |
+          cd ${PACKAGE_FOLDER}
+          PKG_VERSION=$(node -p "require('./package.json').version")
+          JSR_VERSION=$(node -p "require('./jsr.json').version")
+          if [[ "${PKG_VERSION}" != "${VERSION}" ]]; then
+            echo "Tag version ${VERSION} does not match package.json version ${PKG_VERSION}"
+            exit 1
+          fi
+          if [[ "${JSR_VERSION}" != "${VERSION}" ]]; then
+            echo "Tag version ${VERSION} does not match jsr.json version ${JSR_VERSION}"
+            exit 1
+          fi
+
+      - name: Install Dependencies
+        run: npm ci
+
+      # we build each package so all dependencies are met
+      - name: Build
+        run: npm run build
+
+      - name: Run tests
+        run: |
+          cd ${PACKAGE_FOLDER}
+          npm run test
+
+      - name: Copy License
+        run: |
+          cp LICENSE.md ${PACKAGE_FOLDER}/
+
+      - name: Publish to npm
+        shell: bash
+        run: |
+          cd ${PACKAGE_FOLDER} # Navigate to the correct package folder
+
+          # allows to rerun a release if a later step failed
+          PKG_NAME=$(node -p "require('./package.json').name")
+          if npm view "${PKG_NAME}@${VERSION}" version > /dev/null 2>&1; then
+            echo "${PKG_NAME}@${VERSION} is already on npm, skipping"
+            exit 0
+          fi
+
+          echo "Publishing package from ${PACKAGE_FOLDER} with version ${VERSION}"
+
+          # Check if the version is a prerelease (contains a hyphen, e.g., 0.2.0-alpha.0)
+          if [[ "${VERSION}" == *-* ]]; then
+            # Extract the identifier (gets 'alpha' from '0.2.0-alpha.0' or 'rc' from '0.2.0-rc.1')
+            DIST_TAG=$(echo "${VERSION}" | awk -F'-' '{print $2}' | awk -F'.' '{print $1}')
+
+            # Fallback to 'next' if extraction is empty
+            if [[ -z "${DIST_TAG}" ]]; then
+              DIST_TAG="next"
+            fi
+
+            echo "Prerelease detected. Publishing with --tag ${DIST_TAG}"
+            npm publish --provenance --tag ${DIST_TAG}
+          else
+            echo "Stable release detected. Publishing to latest tag."
+            npm publish --provenance
+          fi
+
+      - name: Publish to JSR
+        run: |
+          cd ${PACKAGE_FOLDER} # Navigate to the correct package folder
+
+          # allows to rerun a release if a later step failed
+          JSR_NAME=$(node -p "require('./jsr.json').name")
+          if node -e "fetch('https://jsr.io/${JSR_NAME}/meta.json').then(r => r.json()).then(m => process.exit(m.versions?.['${VERSION}'] ? 0 : 1)).catch(() => process.exit(1))"; then
+            echo "${JSR_NAME}@${VERSION} is already on JSR, skipping"
+            exit 0
+          fi
+
+          echo "Publishing to JSR for package ${PACKAGE_SHORT_NAME}"
+          # the copied license is not committed
+          npx jsr publish --allow-dirty

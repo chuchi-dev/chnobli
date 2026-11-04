@@ -9,12 +9,13 @@
 		"lint": "eslint ./src",
 		"test": "node --expose-gc ../node_modules/.bin/vitest run",
 		"test:watch": "node --expose-gc ../node_modules/.bin/vitest",
+		"check-jsr": "jsr publish --dry-run",
 		"build": "tsc -p tsconfig.build.json",
 		"watch": "tsc -w -p tsconfig.build.json"
 	},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/soerenmeier/chnobli.git"
+		"url": "https://github.com/chuchi-dev/chnobli.git"
 	},
 	"license": "MIT",
 	"exports": {

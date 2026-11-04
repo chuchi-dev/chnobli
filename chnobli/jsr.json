@@ -1,0 +1,16 @@
+{
+	"name": "@chuchi/chnobli",
+	"version": "0.1.11",
+	"license": "MIT",
+	"exports": {
+		".": "./src/chnobli.ts",
+		"./easing": "./src/timing/easing.ts",
+		"./utils": "./src/utils/utils.ts",
+		"./scroll": "./src/scroll/index.ts",
+		"./animator": "./src/animator/index.ts"
+	},
+	"publish": {
+		"include": ["src", "LICENSE.md"],
+		"exclude": ["src/tests"]
+	}
+}
