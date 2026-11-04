@@ -1,6 +1,6 @@
 {
 	"name": "chnobli",
-	"version": "0.1.11",
+	"version": "0.1.12",
 	"author": "Sören Meier <info@soerenmeier.ch>",
 	"type": "module",
 	"scripts": {
