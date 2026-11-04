@@ -338,9 +338,11 @@ export default class ScrollTimeline {
 			const startY = start.y - height * start.view;
 			const endY = end.y - height * end.view;
 
-			if (y >= startY && y < endY) {
+			// the end is included, at the bottom of the page y can't get
+			// past the last offset
+			if (y >= startY && y <= endY) {
 				const dif = endY - startY;
-				const x = 1 - (endY - y) / dif;
+				const x = dif === 0 ? 1 : 1 - (endY - y) / dif;
 
 				return start.position + (end.position - start.position) * x;
 			}
