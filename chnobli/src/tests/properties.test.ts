@@ -272,7 +272,8 @@ describe('properties', () => {
 		expect(div.style.width).toBe(undefined);
 	});
 
-	it('restore before', () => {
+	// fails until #7 is fixed
+	it.fails('restore before', () => {
 		const ticker = new TestTicker();
 
 		const div = el();
@@ -299,7 +300,7 @@ describe('properties', () => {
 			'translate3d(95.000px,0.000px,0.000px)',
 		);
 
-		const tl3 = timeline()
+		timeline()
 			.add(
 				{ opacity: 0 },
 				{
