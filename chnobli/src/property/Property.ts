@@ -16,7 +16,16 @@ export default interface Property<V, I = V> {
 	parseValue(value: ParseableValue): V;
 	interpolate(pos: number): I;
 	setValue(target: Target, value: I): void;
-	removeValue(target: Target): void;
+	/**
+	 * Stores the value which was set on the target before this property
+	 * (for example by another animation)
+	 */
+	saveBefore(target: Target): void;
+	/**
+	 * Restores the value stored in saveBefore or removes the value if
+	 * there was none
+	 */
+	restoreBefore(target: Target): void;
 }
 
 export function newProperty(prop: string, targetType = ''): Property<any> {

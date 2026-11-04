@@ -9,6 +9,8 @@ export default class ObjectTarget implements Target {
 
 	// private transformValues: Map<string, (Value | null)[]>;
 	private styleValues: Map<string, StyleValue | undefined>;
+	// the styles which where set with setStyleValue
+	private setStyles: Set<string>;
 	private firstValues: Map<string, StyleValue | undefined>;
 	// private values: Map<string, Value>;
 
@@ -21,6 +23,7 @@ export default class ObjectTarget implements Target {
 		this.target = target;
 
 		this.styleValues = new Map();
+		this.setStyles = new Set();
 		this.firstValues = new Map();
 		// this.values = new Map();
 	}
@@ -82,12 +85,20 @@ export default class ObjectTarget implements Target {
 		}
 	}
 
+	getSetStyleValue(name: string): StyleValue | null {
+		if (!this.setStyles.has(name)) return null;
+
+		return this.styleValues.get(name) ?? null;
+	}
+
 	setStyleValue(name: string, value: StyleValue): void {
 		this.styleValues.set(name, value);
+		this.setStyles.add(name);
 	}
 
 	removeStyleValue(name: string): void {
 		this.styleValues.set(name, undefined);
+		this.setStyles.delete(name);
 	}
 
 	hasClass(_name: string): boolean {

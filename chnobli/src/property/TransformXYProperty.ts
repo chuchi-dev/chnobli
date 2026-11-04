@@ -13,6 +13,11 @@ export default class TransformXYProperty implements Property<XYValue> {
 	from!: XYValue;
 	to!: XYValue;
 
+	private before: { x: Value | null; y: Value | null } = {
+		x: null,
+		y: null,
+	};
+
 	constructor(name: string) {
 		this.name = name;
 	}
@@ -81,8 +86,18 @@ export default class TransformXYProperty implements Property<XYValue> {
 		target.setTransformValue('y', val.y.withDefaultUnit('px'));
 	}
 
-	removeValue(target: Target) {
-		target.removeTransformValue('x');
-		target.removeTransformValue('y');
+	saveBefore(target: Target) {
+		this.before = {
+			x: target.getTransformValue('x')?.clone() ?? null,
+			y: target.getTransformValue('y')?.clone() ?? null,
+		};
+	}
+
+	restoreBefore(target: Target) {
+		for (const name of ['x', 'y'] as const) {
+			const val = this.before[name];
+			if (val) target.setTransformValue(name, val.clone());
+			else target.removeTransformValue(name);
+		}
 	}
 }

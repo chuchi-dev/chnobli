@@ -48,6 +48,10 @@ export interface Target {
 	removeTransformValue(name: string): void;
 
 	getStyleValue(name: string): StyleValue | null;
+	/**
+	 * Returns the style value only if it was set with setStyleValue
+	 */
+	getSetStyleValue(name: string): StyleValue | null;
 	setStyleValue(name: string, value: StyleValue): void;
 	removeStyleValue(name: string): void;
 

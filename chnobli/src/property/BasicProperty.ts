@@ -18,12 +18,15 @@ export default class BasicProperty implements Property<Value> {
 	 */
 	to: Value | null;
 
+	private before: Value | null;
+
 	constructor(name: string) {
 		// this is the property name
 		this.name = name;
 
 		this.from = null;
 		this.to = null;
+		this.before = null;
 	}
 
 	allowsValueFn() {
@@ -85,7 +88,12 @@ export default class BasicProperty implements Property<Value> {
 		return target.setValue(this.name, val);
 	}
 
-	removeValue(target: Target) {
-		return target.removeValue(this.name);
+	saveBefore(target: Target) {
+		this.before = target.getValue(this.name)?.clone() ?? null;
+	}
+
+	restoreBefore(target: Target) {
+		if (this.before) target.setValue(this.name, this.before.clone());
+		else target.removeValue(this.name);
 	}
 }

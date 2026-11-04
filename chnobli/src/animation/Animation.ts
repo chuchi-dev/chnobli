@@ -160,6 +160,8 @@ class PropertyAnimation<V> {
 
 	// calculate from and to position
 	init(target: Target) {
+		this.prop.saveBefore(target);
+
 		// there is nothing to initialize since on every render we call the
 		// value Fn
 		if (this.staticValueFn) return;
@@ -209,8 +211,7 @@ class PropertyAnimation<V> {
 	}
 
 	restoreBefore(target: Target) {
-		// todo this might not be enough
-		this.prop.removeValue(target);
+		this.prop.restoreBefore(target);
 	}
 
 	render(pos: number, target: Target) {

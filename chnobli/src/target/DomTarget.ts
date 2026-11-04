@@ -16,6 +16,8 @@ export default class DomTarget implements Target {
 
 	private transformValues: Map<string, (Value | null)[]>;
 	private styleValues: Map<string, StyleValue | undefined>;
+	// the styles which where set with setStyleValue
+	private setStyles: Set<string>;
 	private values: Map<string, Value>;
 
 	/**
@@ -31,6 +33,7 @@ export default class DomTarget implements Target {
 
 		this.transformValues = new Map();
 		this.styleValues = new Map();
+		this.setStyles = new Set();
 		this.values = new Map();
 	}
 
@@ -116,12 +119,20 @@ export default class DomTarget implements Target {
 		}
 	}
 
+	getSetStyleValue(name: string): StyleValue | null {
+		if (!this.setStyles.has(name)) return null;
+
+		return this.styleValues.get(name) ?? null;
+	}
+
 	setStyleValue(name: string, value: StyleValue) {
 		this.styleValues.set(name, value);
+		this.setStyles.add(name);
 	}
 
 	removeStyleValue(name: string) {
 		this.styleValues.set(name, undefined);
+		this.setStyles.delete(name);
 	}
 
 	hasClass(name: string): boolean {

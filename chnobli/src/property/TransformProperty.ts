@@ -22,6 +22,7 @@ export const TRANSFORM_PROPS: Record<string, [number, string | null]> = {
 
 export default class TransformProperty extends BasicProperty {
 	private _defaultValue: Value;
+	private _before: Value | null = null;
 
 	constructor(name: string) {
 		super(name);
@@ -50,7 +51,13 @@ export default class TransformProperty extends BasicProperty {
 		target.setTransformValue(this.name, val);
 	}
 
-	removeValue(target: Target) {
-		target.removeTransformValue(this.name);
+	saveBefore(target: Target) {
+		this._before = target.getTransformValue(this.name)?.clone() ?? null;
+	}
+
+	restoreBefore(target: Target) {
+		if (this._before)
+			target.setTransformValue(this.name, this._before.clone());
+		else target.removeTransformValue(this.name);
 	}
 }

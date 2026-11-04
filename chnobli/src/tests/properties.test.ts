@@ -272,8 +272,7 @@ describe('properties', () => {
 		expect(div.style.width).toBe(undefined);
 	});
 
-	// fails until #7 is fixed
-	it.fails('restore before', () => {
+	it('restore before', () => {
 		const ticker = new TestTicker();
 
 		const div = el();
@@ -312,5 +311,99 @@ describe('properties', () => {
 		expect(div.style.transform).toBe(
 			'translate3d(95.000px,0.000px,0.000px)',
 		);
+	});
+
+	it('restore before with a style', () => {
+		const ticker = new TestTicker();
+
+		const div = el();
+		timeline()
+			.add(div, {
+				width: 100,
+				duration: 10,
+			})
+			.play();
+		ticker.run();
+		expect(div.style.width).toBe('100.000px');
+
+		const tl2 = timeline().add(div, {
+			width: 200,
+			duration: 10,
+		});
+		tl2._inner.init();
+
+		timeline().add({ opacity: 0 }, { opacity: 1 }).play();
+		ticker.run();
+		expect(div.style.width).toBe('100.000px');
+
+		tl2.play();
+		ticker.run();
+		expect(div.style.width).toBe('200.000px');
+
+		// going back before tl2 restores the value of the first timeline
+		tl2.seek(-1);
+		ticker.run();
+		expect(div.style.width).toBe('100.000px');
+
+		tl2.destroy();
+		expect(div.style.width).toBe('100.000px');
+	});
+
+	it('restore before in the same timeline', () => {
+		const ticker = new TestTicker();
+
+		const div = el();
+		const tl = timeline()
+			.add(div, {
+				x: 100,
+				duration: 10,
+			})
+			.add(div, {
+				x: 200,
+				duration: 10,
+			});
+
+		tl.seek(0.75);
+		ticker.run();
+		expect(div.style.transform).toBe(
+			'translate3d(150.000px,0.000px,0.000px)',
+		);
+
+		tl.seek(0.25);
+		ticker.run();
+		expect(div.style.transform).toBe(
+			'translate3d(50.000px,0.000px,0.000px)',
+		);
+
+		tl.resetProps();
+		expect(div.style.transform).toBe('');
+	});
+
+	it('restore before with the same start', () => {
+		const ticker = new TestTicker();
+
+		const div = el();
+		const tl = timeline()
+			.add(div, {
+				x: 100,
+				duration: 10,
+			})
+			.add(
+				div,
+				{
+					x: 200,
+					duration: 10,
+				},
+				0,
+			);
+
+		tl.seek(1);
+		ticker.run();
+		expect(div.style.transform).toBe(
+			'translate3d(200.000px,0.000px,0.000px)',
+		);
+
+		tl.resetProps();
+		expect(div.style.transform).toBe('');
 	});
 });

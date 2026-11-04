@@ -40,6 +40,7 @@ export default class StyleProperty
 	// from and to are text
 
 	private _defaultValue: StyleValue | null;
+	private _before: StyleValue | null = null;
 
 	constructor(name: string, useDefaults: boolean = true) {
 		this.name = name;
@@ -267,7 +268,12 @@ export default class StyleProperty
 		return target.setStyleValue(this.name, val.withDefaultUnit(this.unit));
 	}
 
-	removeValue(target: Target) {
-		return target.removeStyleValue(this.name);
+	saveBefore(target: Target) {
+		this._before = target.getSetStyleValue(this.name)?.clone() ?? null;
+	}
+
+	restoreBefore(target: Target) {
+		if (this._before) target.setStyleValue(this.name, this._before.clone());
+		else target.removeStyleValue(this.name);
 	}
 }

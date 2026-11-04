@@ -247,7 +247,9 @@ export default class Timeline {
 
 		this.timing.reversed = reversed;
 		this.timing.seek(-1);
-		startOrdered.forEach(e => {
+		// render the last first so the value from before the first animation
+		// is restored
+		startOrdered.reverse().forEach(e => {
 			e.value.seek(-1);
 			e.value.render();
 		});
@@ -255,7 +257,8 @@ export default class Timeline {
 
 	render() {
 		// the rendering order needs to be as follows
-		// upcoming
+		// upcoming (ordered by the start descending, so the earliest
+		// animation restores its value from before last)
 		// passed
 		// active
 
@@ -284,6 +287,8 @@ export default class Timeline {
 
 		const pos = this.timing.positionMsUnbounded();
 
+		const upcoming: Entry[] = [];
+
 		for (const entry of this.entries) {
 			if (entry.type !== 'animation' && entry.type !== 'timeline')
 				continue;
@@ -294,11 +299,15 @@ export default class Timeline {
 			if (animation.timing.state >= STATE_ENDED) {
 				this._renderQueue.passed.push(animation);
 			} else if (animation.timing.state <= STATE_BEFORE) {
-				this._renderQueue.upcoming.push(animation);
+				upcoming.push(entry);
 			} else {
 				this._renderQueue.active.push(animation);
 			}
 		}
+
+		// reverse first so entries with the same start keep the reverse order
+		upcoming.reverse().sort((a, b) => b.start! - a.start!);
+		this._renderQueue.upcoming = upcoming.map(e => e.value);
 	}
 
 	update() {
@@ -327,7 +336,13 @@ export default class Timeline {
 	}
 
 	destroy(opts: DestroyOptions) {
-		for (const entry of this.entries) {
+		// destroy the last first so the value from before the first animation
+		// is restored
+		const entries = this.entries
+			.slice()
+			.reverse()
+			.sort((a, b) => (b.start ?? 0) - (a.start ?? 0));
+		for (const entry of entries) {
 			if (entry.type === 'timeline') {
 				entry.value.destroy(opts);
 				continue;

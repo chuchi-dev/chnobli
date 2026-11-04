@@ -122,7 +122,10 @@ export default class ClassProperty implements Property<string[], Interpolated> {
 		});
 	}
 
-	removeValue(target: Target) {
+	// the state before is stored in init
+	saveBefore(_target: Target) {}
+
+	restoreBefore(target: Target) {
 		this.preStates.forEach((exists, cls) => {
 			if (exists) target.addClass(cls);
 			else target.removeClass(cls);
